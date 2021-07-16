@@ -16,6 +16,7 @@ export const { select } = store;
 export const state = store.getState();
 
 export type Store = typeof store;
+export type StateType = typeof state;
 
 export type Dispatch = RematchDispatch<RootModel>;
 export type RootState = RematchRootState<RootModel>;

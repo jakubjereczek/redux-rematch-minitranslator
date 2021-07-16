@@ -1,22 +1,45 @@
 import React from 'react';
-import { store, state } from '../store';
-import { useAppDispatch, useAppSelector } from '../hooks';
+import { store, StateType } from '../store';
+import { useAppSelector } from '../hooks';
+import { connect } from 'react-redux';
+import { WordMeaning } from '../models/wordModel';
+import Word from './Word';
 
-const WordsList = () => {
+// 1. selectors
+const translatedWords = (state: StateType) => store.select.word.getSelectedWordsMeaningSelector(state)
 
-    const words = useAppSelector(state => state.word.words);
-    const words2 = store.select.word.wordsSelector(state);
+const mapStateToProps = (state: StateType) => ({
+    words: translatedWords(state),
+})
 
-    const translatedWords = store.select.word.getSelectedWordsMeaningSelector(state)
-    console.log(translatedWords)
+type StateProps = ReturnType<typeof mapStateToProps>;
+
+const WordsList = (props: StateProps) => {
+
+    // 2. use seletors 
+    const filters = useAppSelector(state => state.word.filters);
+    const words: WordMeaning[] = props.words;
+
+    const wordsList = words.map((word) => {
+        return (
+            <Word key={word.meaning} {...word} />
+        )
+    });
 
     return (
         <div>
             <h2>
-                WordsList
+                minitranslator app
             </h2>
+            <h3>
+                current filters: {filters.from} to {filters.to}
+            </h3>
+            <ul>
+                {wordsList}
+            </ul>
         </div>
     )
 }
 
-export default WordsList;
+
+export default connect(mapStateToProps)(WordsList)

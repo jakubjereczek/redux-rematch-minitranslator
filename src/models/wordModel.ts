@@ -1,8 +1,9 @@
 import { createModel } from "@rematch/core";
+import { Selector } from "@rematch/select";
 import { getWordsAsync } from "../db";
 import { RootModel } from "./models";
 
-type availableLanguages = "PL" | "EN" | 'GE';
+export type availableLanguages = "PL" | "EN" | 'GE';
 
 export interface Word {
     PL: string,
@@ -25,17 +26,8 @@ interface WordState {
     filters: Filter
 }
 
-const initialState: WordState = {
-    words: [{
-        "PL": "dzwonek",
-        "EN": "bell",
-        "GE": "glocke"
-    },
-    {
-        "PL": "drzwi",
-        "EN": "door",
-        "GE": "tür"
-    }],
+export const initialState: WordState = {
+    words: [],
     filters: {
         from: "PL",
         to: "EN"
@@ -46,7 +38,6 @@ export const word = createModel<RootModel>()({
     state: initialState,
     reducers: {
         LOAD_WORDS(state, payload: Word[]) {
-            console.log("1. words are loaded")
             return {
                 ...state,
                 words: payload
@@ -56,6 +47,13 @@ export const word = createModel<RootModel>()({
             return {
                 ...state,
                 words: [...state.words, payload]
+            }
+        },
+        CHANGE_FILTER(state, payload: Filter) {
+            console.log("PAYLOAD JEST RÓWNY", payload)
+            return {
+                ...state,
+                filters: payload
             }
         },
     },
@@ -73,16 +71,23 @@ export const word = createModel<RootModel>()({
             return slice((words: WordState) => {
                 return words.words
             });
+            // return createSelector<any, WordState, Word[]>(
+            //     slice,
+            //     words => words.words
+            // )
         },
         filtersSelector() {
             return slice((words: WordState) => words.filters);
+            // return createSelector<any, WordState, Filter>(
+            //     slice,
+            //     words => words.filters
+            // )
         },
         getSelectedWordsMeaningSelector() {
-            return createSelector(
-                slice,
+            return createSelector<any, any, any, WordMeaning[]>(
                 this.wordsSelector,
                 this.filtersSelector,
-                (items: any, filter: any) => {
+                (items: Word[], filter: Filter) => {
                     return items.map((w: Word): WordMeaning => {
                         const filters = filter as Filter;
                         return {
