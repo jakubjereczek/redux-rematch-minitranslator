@@ -11,6 +11,10 @@ export const store = init<RootModel, FullModel>({
     plugins: [loadingPlugin(), selectPlugin()],
 
 });
+
+export const { select } = store;
+export const state = store.getState();
+
 export type Store = typeof store;
 
 export type Dispatch = RematchDispatch<RootModel>;

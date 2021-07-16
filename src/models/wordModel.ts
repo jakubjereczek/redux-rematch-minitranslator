@@ -2,7 +2,6 @@ import { createModel } from "@rematch/core";
 import { getWordsAsync } from "../db";
 import { RootModel } from "./models";
 
-
 type availableLanguages = "PL" | "EN" | 'GE';
 
 export interface Word {
@@ -13,19 +12,30 @@ export interface Word {
 
 export interface WordMeaning {
     word: string,
-    meading: string
+    meaning: string
+}
+
+export interface Filter {
+    from: availableLanguages,
+    to: availableLanguages
 }
 
 interface WordState {
     words: Word[],
-    filters: {
-        from: availableLanguages,
-        to: availableLanguages
-    }
+    filters: Filter
 }
 
 const initialState: WordState = {
-    words: [],
+    words: [{
+        "PL": "dzwonek",
+        "EN": "bell",
+        "GE": "glocke"
+    },
+    {
+        "PL": "drzwi",
+        "EN": "door",
+        "GE": "tür"
+    }],
     filters: {
         from: "PL",
         to: "EN"
@@ -35,25 +45,55 @@ const initialState: WordState = {
 export const word = createModel<RootModel>()({
     state: initialState,
     reducers: {
-        load(state, payload: Word[]) {
+        LOAD_WORDS(state, payload: Word[]) {
+            console.log("1. words are loaded")
             return {
                 ...state,
                 words: payload
             }
         },
-        add(state, payload: Word) {
+        ADD_WORD(state, payload: Word) {
             return {
                 ...state,
                 words: [...state.words, payload]
             }
         },
     },
-    effects: (dispatch) => ({
-        async getAsync() {
-            const words = await getWordsAsync();
-            dispatch.word.load(words);
+    effects: (dispatch) => {
+        const { word } = dispatch;
+        return {
+            async getAsync() {
+                const words = await getWordsAsync();
+                word.LOAD_WORDS(words);
+            }
+        }
+    },
+    selectors: (slice, createSelector, hasProps) => ({
+        wordsSelector() {
+            return slice((words: WordState) => {
+                return words.words
+            });
         },
-    }),
+        filtersSelector() {
+            return slice((words: WordState) => words.filters);
+        },
+        getSelectedWordsMeaningSelector() {
+            return createSelector(
+                slice,
+                this.wordsSelector,
+                this.filtersSelector,
+                (items: any, filter: any) => {
+                    return items.map((w: Word): WordMeaning => {
+                        const filters = filter as Filter;
+                        return {
+                            word: w[filters.from],
+                            meaning: w[filters.to]
+                        }
+                    })
+                }
+            )
+        }
+    })
 });
 
 
