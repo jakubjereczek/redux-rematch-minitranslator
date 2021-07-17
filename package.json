@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@rematch/core": "^2.0.1",
+    "@rematch/immer": "^2.0.1",
     "@rematch/loading": "^2.0.1",
     "@rematch/select": "^3.0.1",
     "@testing-library/jest-dom": "^5.14.1",

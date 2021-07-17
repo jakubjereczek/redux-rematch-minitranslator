@@ -44,13 +44,16 @@ export const word = createModel<RootModel>()({
             }
         },
         ADD_WORD(state, payload: Word) {
-            return {
-                ...state,
-                words: [...state.words, payload]
-            }
+            // return {
+            //     ...state,
+            //     words: [...state.words, payload]
+            // }
+
+            // use immer
+            state.words.push(payload);
+            return state;
         },
         CHANGE_FILTER(state, payload: Filter) {
-            console.log("PAYLOAD JEST RÓWNY", payload)
             return {
                 ...state,
                 filters: payload

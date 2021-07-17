@@ -3,12 +3,14 @@ import { models, RootModel } from "./models/models"
 
 import loadingPlugin, { ExtraModelsFromLoading } from "@rematch/loading";
 import selectPlugin from '@rematch/select'
+import immerPlugin from "@rematch/immer"
+
 
 type FullModel = ExtraModelsFromLoading<RootModel>
 
 export const store = init<RootModel, FullModel>({
     models,
-    plugins: [loadingPlugin(), selectPlugin()],
+    plugins: [loadingPlugin(), selectPlugin(), immerPlugin()],
 
 });
 
